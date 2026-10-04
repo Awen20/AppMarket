@@ -6,7 +6,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -20,26 +19,14 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Generate Temporary Keystore
-        run: |
-          keytool -genkeypair -v -keystore release.jks \
-            -alias tempkey -keyalg RSA -keysize 2048 -validity 10000 \
-            -storepass 123456 -keypass 123456 \
-            -dname "CN=AppMarket, OU=Dev, O=Dev, L=City, S=State, C=CN"
-
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build Release APK
-        env:
-          KEYSTORE_PATH: ${{ github.workspace }}/release.jks
-          KEYSTORE_PASS: 123456
-          KEY_ALIAS: tempkey
-          KEY_PASSWORD: 123456
-        run: ./gradlew :app:android:assembleRelease --stacktrace
+      - name: Build Debug APK
+        run: ./gradlew :app:android:assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: AppMarket-Release-APK
-          path: app/android/build/outputs/apk/release/*.apk
+          name: AppMarket-Debug-APK
+          path: 'app/android/build/outputs/apk/debug/*.apk'
